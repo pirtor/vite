@@ -42,12 +42,12 @@ type FrameworkVariant = {
 const FRAMEWORKS: Framework[] = [
   {
     name: 'vanilla',
-    display: 'Vanilla',
+    display: '⟡ Vanilla',
     color: yellow,
     variants: [
       {
         name: 'vanilla-ts',
-        display: 'TypeScript',
+        display: '⟡ TypeScript',
         color: blue,
       },
       {
@@ -239,7 +239,7 @@ const renameFiles: Record<string, string | undefined> = {
   _gitignore: '.gitignore',
 }
 
-const defaultTargetDir = 'vite-project'
+const defaultTargetDir = 'demo'
 
 async function init() {
   const argTargetDir = formatTargetDir(argv._[0])
