@@ -88,17 +88,17 @@ const FRAMEWORKS: Framework[] = [
   },
   {
     name: 'react',
-    display: 'React',
+    display: '⟡ React',
     color: cyan,
     variants: [
       {
         name: 'react-ts',
-        display: 'TypeScript',
+        display: '⟡ TypeScript',
         color: blue,
       },
       {
         name: 'react-swc-ts',
-        display: 'TypeScript + SWC',
+        display: '⟡ TypeScript + SWC',
         color: blue,
       },
       {
