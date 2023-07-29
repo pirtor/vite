@@ -1,9 +1,9 @@
 {
-  "name": "create-vite",
+  "name": "@pirtor/create-vite",
   "version": "4.4.1",
   "type": "module",
   "license": "MIT",
-  "author": "Evan You",
+  "author": "Evan You, fork and modified by Pirtor",
   "bin": {
     "create-vite": "index.js",
     "cva": "index.js"
@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/vitejs/vite/issues"
   },
-  "homepage": "https://github.com/vitejs/vite/tree/main/packages/create-vite#readme",
+  "homepage": "https://github.com/pirtor/vite/tree/main/packages/create-vite#readme",
   "funding": "https://github.com/vitejs/vite?sponsor=1",
   "devDependencies": {
     "@types/minimist": "^1.2.2",
