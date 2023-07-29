@@ -35,20 +35,20 @@ concurrency:
 jobs:
   test:
     timeout-minutes: 20
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node_version: [14, 16, 18, 20]
-        include:
-          # Active LTS + other OS
-          - os: macos-latest
-            node_version: 18
-          - os: windows-latest
-            node_version: 18
-      fail-fast: false
+    runs-on: ubuntu-latest
+    # strategy:
+    #   matrix:
+    #     os: [ubuntu-latest]
+    #     node_version: [14, 16, 18, 20]
+    #     include:
+    #       # Active LTS + other OS
+    #       - os: macos-latest
+    #         node_version: 18
+    #       - os: windows-latest
+    #         node_version: 18
+    #   fail-fast: false
 
-    name: "Build&Test: node-${{ matrix.node_version }}, ${{ matrix.os }}"
+    name: "Build&Test: ubuntu-latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
