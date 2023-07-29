@@ -1,3 +1,9 @@
+## <small>4.4.3 (2023-07-29)</small>
+
+* fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/vitejs/vite/commit/57cabbf))
+
+
+
 ## <small>4.4.2 (2023-07-29)</small>
 
 * chore: add funding field (#13585) ([2501627](https://github.com/vitejs/vite/commit/2501627)), closes [#13585](https://github.com/vitejs/vite/issues/13585)
