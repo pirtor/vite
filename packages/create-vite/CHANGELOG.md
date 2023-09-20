@@ -1,5 +1,11 @@
 ## <small>4.4.4 (2023-09-20)</small>
 
+* chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
+
+
+
+## <small>4.4.4 (2023-09-20)</small>
+
 * feat(create-vite): update templates ([5d02151](https://github.com/vitejs/vite/commit/5d02151))
 * chore: ensure create-vite has unbuild dev dep (#14419) ([881d080](https://github.com/vitejs/vite/commit/881d080)), closes [#14419](https://github.com/vitejs/vite/issues/14419)
 * chore(create-vite): add npm badge (#14251) ([68bd0a8](https://github.com/vitejs/vite/commit/68bd0a8)), closes [#14251](https://github.com/vitejs/vite/issues/14251)
