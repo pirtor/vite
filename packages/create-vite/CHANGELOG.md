@@ -1,3 +1,19 @@
+## <small>4.4.4 (2023-09-20)</small>
+
+* feat(create-vite): update templates ([5d02151](https://github.com/vitejs/vite/commit/5d02151))
+* chore: ensure create-vite has unbuild dev dep (#14419) ([881d080](https://github.com/vitejs/vite/commit/881d080)), closes [#14419](https://github.com/vitejs/vite/issues/14419)
+* chore(create-vite): add npm badge (#14251) ([68bd0a8](https://github.com/vitejs/vite/commit/68bd0a8)), closes [#14251](https://github.com/vitejs/vite/issues/14251)
+* chore(deps): update all non-major dependencies (#13938) ([a1b519e](https://github.com/vitejs/vite/commit/a1b519e)), closes [#13938](https://github.com/vitejs/vite/issues/13938)
+* chore(deps): update all non-major dependencies (#14034) ([b0ebf5c](https://github.com/vitejs/vite/commit/b0ebf5c)), closes [#14034](https://github.com/vitejs/vite/issues/14034)
+* chore(templates): alias react to preact/compat in tsconfig (#14262) ([c796959](https://github.com/vitejs/vite/commit/c796959)), closes [#14262](https://github.com/vitejs/vite/issues/14262)
+* fix(create-vite): remove redundant tsconfig include configuration (#14256) ([6ea34cc](https://github.com/vitejs/vite/commit/6ea34cc)), closes [#14256](https://github.com/vitejs/vite/issues/14256)
+* fix(deps): update all non-major dependencies (#14092) ([68638f7](https://github.com/vitejs/vite/commit/68638f7)), closes [#14092](https://github.com/vitejs/vite/issues/14092)
+* docs: detect Bun package manager in `create-vite` (#14017) ([4d3cdd1](https://github.com/vitejs/vite/commit/4d3cdd1)), closes [#14017](https://github.com/vitejs/vite/issues/14017)
+* docs: remove npm@6 commands (#14240) ([65b6906](https://github.com/vitejs/vite/commit/65b6906)), closes [#14240](https://github.com/vitejs/vite/issues/14240)
+* feat!: bump minimum node version to 18 (#14030) ([2c1a45c](https://github.com/vitejs/vite/commit/2c1a45c)), closes [#14030](https://github.com/vitejs/vite/issues/14030)
+
+
+
 ## <small>4.4.3 (2023-07-29)</small>
 
 * fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/vitejs/vite/commit/57cabbf))
