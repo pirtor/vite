@@ -18,10 +18,10 @@ import {
   getHash,
   isDataUrl,
   isExternalUrl,
-  isUrl,
   normalizePath,
   processSrcSet,
   removeLeadingSlash,
+  urlCanParse,
 } from '../utils'
 import type { ResolvedConfig } from '../config'
 import { toOutputFilePathInHtml } from '../build'
@@ -593,8 +593,8 @@ export function buildHtmlPlugin(config: ResolvedConfig): Plugin {
         // inject module preload polyfill only when configured and needed
         const { modulePreload } = config.build
         if (
-          (modulePreload === true ||
-            (typeof modulePreload === 'object' && modulePreload.polyfill)) &&
+          modulePreload !== false &&
+          modulePreload.polyfill &&
           (someScriptsAreAsync || someScriptsAreDefer)
         ) {
           js = `import "${modulePreloadPolyfillId}";\n${js}`
@@ -823,7 +823,7 @@ export function buildHtmlPlugin(config: ResolvedConfig): Plugin {
             getPublicAssetFilename(fileHash, config)!,
           )
 
-          return isUrl(publicAssetPath)
+          return urlCanParse(publicAssetPath)
             ? publicAssetPath
             : normalizePath(publicAssetPath)
         })
