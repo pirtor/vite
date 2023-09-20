@@ -1,3 +1,10 @@
+## <small>4.4.5 (2023-09-20)</small>
+
+* release: create-vite@4.4.4 ([76a7879](https://github.com/pirtor/vite/commit/76a7879))
+* chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
+
+
+
 ## <small>4.4.4 (2023-09-20)</small>
 
 * chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
