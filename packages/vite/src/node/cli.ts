@@ -8,7 +8,7 @@ import type { ServerOptions } from './server'
 import type { LogLevel } from './logger'
 import { createLogger } from './logger'
 import { VERSION } from './constants'
-import { resolveConfig } from '.'
+import { resolveConfig } from './config'
 
 const cli = cac('vite')
 
@@ -185,7 +185,11 @@ cli
         `\n  ${colors.green(
           `${colors.bold('VITE')} v${VERSION}`,
         )}  ${startupDurationString}\n`,
-        { clear: !server.config.logger.hasWarned },
+        {
+          clear:
+            !server.config.logger.hasWarned &&
+            !(globalThis as any).__vite_cjs_skip_clear_screen,
+        },
       )
 
       server.printUrls()
