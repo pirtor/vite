@@ -66,6 +66,7 @@ import {
 import { timeMiddleware } from './middlewares/time'
 import type { ModuleNode } from './moduleGraph'
 import { ModuleGraph } from './moduleGraph'
+import { notFoundMiddleware } from './middlewares/notFound'
 import { errorMiddleware, prepareError } from './middlewares/error'
 import type { HmrOptions } from './hmr'
 import {
@@ -108,7 +109,7 @@ export interface ServerOptions extends CommonServerOptions {
    * Create Vite dev server to be used as a middleware in an existing server
    * @default false
    */
-  middlewareMode?: boolean | 'html' | 'ssr'
+  middlewareMode?: boolean
   /**
    * Options for files served via '/\@fs/'.
    */
@@ -692,14 +693,10 @@ export async function _createServer(
 
   if (config.appType === 'spa' || config.appType === 'mpa') {
     // transform index.html
-    middlewares.use(indexHtmlMiddleware(server))
+    middlewares.use(indexHtmlMiddleware(root, server))
 
     // handle 404s
-    // Keep the named function. The name is visible in debug logs via `DEBUG=connect:dispatcher ...`
-    middlewares.use(function vite404Middleware(_, res) {
-      res.statusCode = 404
-      res.end()
-    })
+    middlewares.use(notFoundMiddleware())
   }
 
   // error handler
@@ -863,9 +860,7 @@ export function resolveServerOptions(
 
 async function restartServer(server: ViteDevServer) {
   global.__vite_start_time = performance.now()
-  const { port: prevPort, host: prevHost } = server.config.server
   const shortcutsOptions = server._shortcutsOptions
-  const oldUrls = server.resolvedUrls
 
   let inlineConfig = server.config.inlineConfig
   if (server._forceOptimizeOnRestart) {
@@ -895,26 +890,47 @@ async function restartServer(server: ViteDevServer) {
 
   const {
     logger,
-    server: { port, host, middlewareMode },
+    server: { port, middlewareMode },
   } = server.config
   if (!middlewareMode) {
     await server.listen(port, true)
-    logger.info('server restarted.', { timestamp: true })
-    if (
-      (port ?? DEFAULT_DEV_PORT) !== (prevPort ?? DEFAULT_DEV_PORT) ||
-      host !== prevHost ||
-      diffDnsOrderChange(oldUrls, newServer.resolvedUrls)
-    ) {
-      logger.info('')
-      server.printUrls()
-    }
   } else {
     server.ws.listen()
-    logger.info('server restarted.', { timestamp: true })
   }
+  logger.info('server restarted.', { timestamp: true })
 
   if (shortcutsOptions) {
     shortcutsOptions.print = false
     bindCLIShortcuts(newServer, shortcutsOptions)
+  }
+}
+
+/**
+ * Internal function to restart the Vite server and print URLs if changed
+ */
+export async function restartServerWithUrls(
+  server: ViteDevServer,
+): Promise<void> {
+  if (server.config.server.middlewareMode) {
+    await server.restart()
+    return
+  }
+
+  const { port: prevPort, host: prevHost } = server.config.server
+  const prevUrls = server.resolvedUrls
+
+  await server.restart()
+
+  const {
+    logger,
+    server: { port, host },
+  } = server.config
+  if (
+    (port ?? DEFAULT_DEV_PORT) !== (prevPort ?? DEFAULT_DEV_PORT) ||
+    host !== prevHost ||
+    diffDnsOrderChange(prevUrls, server.resolvedUrls)
+  ) {
+    logger.info('')
+    server.printUrls()
   }
 }

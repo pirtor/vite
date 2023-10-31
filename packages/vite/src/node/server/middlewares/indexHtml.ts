@@ -23,7 +23,7 @@ import {
   resolveHtmlTransforms,
   traverseHtml,
 } from '../../plugins/html'
-import type { ResolvedConfig, ViteDevServer } from '../..'
+import type { PreviewServer, ResolvedConfig, ViteDevServer } from '../..'
 import { send } from '../send'
 import { CLIENT_PUBLIC_PATH, FS_PREFIX } from '../../constants'
 import {
@@ -32,6 +32,7 @@ import {
   fsPathFromId,
   getHash,
   injectQuery,
+  isDevServer,
   isJSRequest,
   joinUrlSegments,
   normalizePath,
@@ -63,6 +64,7 @@ export function createDevHtmlTransformFn(
 ): (url: string, html: string, originalUrl: string) => Promise<string> {
   const [preHooks, normalHooks, postHooks] = resolveHtmlTransforms(
     server.config.plugins,
+    server.config.logger,
   )
   return (url: string, html: string, originalUrl: string): Promise<string> => {
     return applyHtmlTransforms(
@@ -102,7 +104,7 @@ function shouldPreTransform(url: string, config: ResolvedConfig) {
   )
 }
 
-const startsWithWordCharRE = /^\w/
+const wordCharRE = /\w/
 
 const isSrcSet = (attr: Token.Attribute) =>
   attr.name === 'srcset' && attr.prefix === undefined
@@ -125,9 +127,13 @@ const processNodeUrl = (
     (url[0] === '/' && url[1] !== '/') ||
     // #3230 if some request url (localhost:3000/a/b) return to fallback html, the relative assets
     // path will add `/a/` prefix, it will caused 404.
-    // rewrite before `./index.js` -> `localhost:5173/a/index.js`.
-    // rewrite after `../index.js` -> `localhost:5173/index.js`.
-    ((url[0] === '.' || startsWithWordCharRE.test(url)) &&
+    //
+    // skip if url contains `:` as it implies a url protocol or Windows path that we don't want to replace.
+    //
+    // rewrite `./index.js` -> `localhost:5173/a/index.js`.
+    // rewrite `../index.js` -> `localhost:5173/index.js`.
+    // rewrite `relative/index.js` -> `localhost:5173/a/relative/index.js`.
+    ((url[0] === '.' || (wordCharRE.test(url[0]) && !url.includes(':'))) &&
       originalUrl &&
       originalUrl !== '/' &&
       htmlPath === '/index.html')
@@ -373,8 +379,14 @@ const devHtmlHook: IndexHtmlTransformHook = async (
 }
 
 export function indexHtmlMiddleware(
-  server: ViteDevServer,
+  root: string,
+  server: ViteDevServer | PreviewServer,
 ): Connect.NextHandleFunction {
+  const isDev = isDevServer(server)
+  const headers = isDev
+    ? server.config.server.headers
+    : server.config.preview.headers
+
   // Keep the named function. The name is visible in debug logs via `DEBUG=connect:dispatcher ...`
   return async function viteIndexHtmlMiddleware(req, res, next) {
     if (res.writableEnded) {
@@ -384,14 +396,20 @@ export function indexHtmlMiddleware(
     const url = req.url && cleanUrl(req.url)
     // htmlFallbackMiddleware appends '.html' to URLs
     if (url?.endsWith('.html') && req.headers['sec-fetch-dest'] !== 'script') {
-      const filename = getHtmlFilename(url, server)
-      if (fs.existsSync(filename)) {
+      let filePath: string
+      if (isDev && url.startsWith(FS_PREFIX)) {
+        filePath = decodeURIComponent(fsPathFromId(url))
+      } else {
+        filePath = path.join(root, decodeURIComponent(url))
+      }
+
+      if (fs.existsSync(filePath)) {
         try {
-          let html = await fsp.readFile(filename, 'utf-8')
-          html = await server.transformIndexHtml(url, html, req.originalUrl)
-          return send(req, res, html, 'html', {
-            headers: server.config.server.headers,
-          })
+          let html = await fsp.readFile(filePath, 'utf-8')
+          if (isDev) {
+            html = await server.transformIndexHtml(url, html, req.originalUrl)
+          }
+          return send(req, res, html, 'html', { headers })
         } catch (e) {
           return next(e)
         }
