@@ -1,3 +1,8 @@
+## <small>4.4.7 (2023-10-31)</small>
+
+
+
+
 ## <small>4.4.6 (2023-10-31)</small>
 
 * feat(create-vite): update template ([a3d1040](https://github.com/pirtor/vite/commit/a3d1040))
