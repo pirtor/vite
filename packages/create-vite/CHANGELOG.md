@@ -1,3 +1,8 @@
+## <small>5.0.1 (2023-11-22)</small>
+
+
+
+
 ## 5.0.0 (2023-11-22)
 
 * release: create-vite@5.0.0 ([43bb137](https://github.com/pirtor/vite/commit/43bb137))
