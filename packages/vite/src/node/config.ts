@@ -10,7 +10,7 @@ import type { Alias, AliasOptions } from 'dep-types/alias'
 import aliasPlugin from '@rollup/plugin-alias'
 import { build } from 'esbuild'
 import type { RollupOptions } from 'rollup'
-import type { HookHandler, Plugin } from './plugin'
+import type { HookHandler, Plugin, PluginWithRequiredHook } from './plugin'
 import type {
   BuildOptions,
   RenderBuiltAssetUrl,
@@ -43,6 +43,7 @@ import {
 } from './utils'
 import {
   createPluginHookUtils,
+  getHookHandler,
   getSortedPluginsByHook,
   resolvePlugins,
 } from './plugins'
@@ -76,10 +77,8 @@ const promisifiedRealpath = promisify(fs.realpath)
 export interface ConfigEnv {
   command: 'build' | 'serve'
   mode: string
-  /**
-   * @experimental
-   */
-  ssrBuild?: boolean
+  isSsrBuild?: boolean
+  isPreview?: boolean
 }
 
 /**
@@ -364,7 +363,7 @@ export type ResolvedConfig = Readonly<
       alias: Alias[]
     }
     plugins: readonly Plugin[]
-    css: ResolvedCSSOptions | undefined
+    css: ResolvedCSSOptions
     esbuild: ESBuildOptions | false
     server: ResolvedServerOptions
     build: ResolvedBuildOptions
@@ -383,7 +382,9 @@ export type ResolvedConfig = Readonly<
 >
 
 export interface PluginHookUtils {
-  getSortedPlugins: (hookName: keyof Plugin) => Plugin[]
+  getSortedPlugins: <K extends keyof Plugin>(
+    hookName: K,
+  ) => PluginWithRequiredHook<K>[]
   getSortedPluginHooks: <K extends keyof Plugin>(
     hookName: K,
   ) => NonNullable<HookHandler<Plugin[K]>>[]
@@ -401,6 +402,7 @@ export async function resolveConfig(
   command: 'build' | 'serve',
   defaultMode = 'development',
   defaultNodeEnv = 'development',
+  isPreview = false,
 ): Promise<ResolvedConfig> {
   let config = inlineConfig
   let configFileDependencies: string[] = []
@@ -414,10 +416,11 @@ export async function resolveConfig(
     process.env.NODE_ENV = defaultNodeEnv
   }
 
-  const configEnv = {
+  const configEnv: ConfigEnv = {
     mode,
     command,
-    ssrBuild: !!config.build?.ssr,
+    isSsrBuild: !!config.build?.ssr,
+    isPreview,
   }
 
   let { configFile } = config
@@ -482,21 +485,6 @@ export async function resolveConfig(
     allowClearScreen: config.clearScreen,
     customLogger: config.customLogger,
   })
-
-  let foundDiscouragedVariableName
-  if (
-    (foundDiscouragedVariableName = Object.keys(config.define ?? {}).find((k) =>
-      ['process', 'global'].includes(k),
-    ))
-  ) {
-    logger.warn(
-      colors.yellow(
-        `Replacing ${colors.bold(
-          foundDiscouragedVariableName,
-        )} using the define option is discouraged. See https://vitejs.dev/config/shared-options.html#define for more details.`,
-      ),
-    )
-  }
 
   // resolve root
   const resolvedRoot = normalizePath(
@@ -1104,7 +1092,7 @@ async function bundleConfigFile(
                     throw new Error(
                       `Failed to resolve ${JSON.stringify(
                         id,
-                      )}. This package is ESM only but it was tried to load by \`require\`. See http://vitejs.dev/guide/troubleshooting.html#this-package-is-esm-only for more details.`,
+                      )}. This package is ESM only but it was tried to load by \`require\`. See https://vitejs.dev/guide/troubleshooting.html#this-package-is-esm-only for more details.`,
                     )
                   }
                 }
@@ -1121,7 +1109,7 @@ async function bundleConfigFile(
                 throw new Error(
                   `${JSON.stringify(
                     id,
-                  )} resolved to an ESM file. ESM file cannot be loaded by \`require\`. See http://vitejs.dev/guide/troubleshooting.html#this-package-is-esm-only for more details.`,
+                  )} resolved to an ESM file. ESM file cannot be loaded by \`require\`. See https://vitejs.dev/guide/troubleshooting.html#this-package-is-esm-only for more details.`,
                 )
               }
               return {
@@ -1222,7 +1210,7 @@ async function runConfigHook(
 
   for (const p of getSortedPluginsByHook('config', plugins)) {
     const hook = p.config
-    const handler = hook && 'handler' in hook ? hook.handler : hook
+    const handler = getHookHandler(hook)
     if (handler) {
       const res = await handler(conf, configEnv)
       if (res) {

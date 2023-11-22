@@ -1,7 +1,8 @@
-import aliasPlugin from '@rollup/plugin-alias'
+import aliasPlugin, { type ResolverFunction } from '@rollup/plugin-alias'
+import type { ObjectHook } from 'rollup'
 import type { PluginHookUtils, ResolvedConfig } from '../config'
 import { isDepsOptimizerEnabled } from '../config'
-import type { HookHandler, Plugin } from '../plugin'
+import type { HookHandler, Plugin, PluginWithRequiredHook } from '../plugin'
 import { getDepsOptimizer } from '../optimizer'
 import { shouldExternalizeForSSR } from '../ssr/ssrExternal'
 import { watchPackageDataPlugin } from '../packages'
@@ -50,7 +51,10 @@ export async function resolvePlugins(
     isBuild ? metadataPlugin() : null,
     !isWorker ? watchPackageDataPlugin(config.packageCache) : null,
     preAliasPlugin(config),
-    aliasPlugin({ entries: config.resolve.alias }),
+    aliasPlugin({
+      entries: config.resolve.alias,
+      customResolver: viteAliasCustomResolver,
+    }),
     ...prePlugins,
     modulePreload !== false && modulePreload.polyfill
       ? modulePreloadPolyfillPlugin(config)
@@ -106,9 +110,11 @@ export function createPluginHookUtils(
 ): PluginHookUtils {
   // sort plugins per hook
   const sortedPluginsCache = new Map<keyof Plugin, Plugin[]>()
-  function getSortedPlugins(hookName: keyof Plugin): Plugin[] {
+  function getSortedPlugins<K extends keyof Plugin>(
+    hookName: K,
+  ): PluginWithRequiredHook<K>[] {
     if (sortedPluginsCache.has(hookName))
-      return sortedPluginsCache.get(hookName)!
+      return sortedPluginsCache.get(hookName) as PluginWithRequiredHook<K>[]
     const sorted = getSortedPluginsByHook(hookName, plugins)
     sortedPluginsCache.set(hookName, sorted)
     return sorted
@@ -117,14 +123,7 @@ export function createPluginHookUtils(
     hookName: K,
   ): NonNullable<HookHandler<Plugin[K]>>[] {
     const plugins = getSortedPlugins(hookName)
-    return plugins
-      .map((p) => {
-        const hook = p[hookName]!
-        return typeof hook === 'object' && 'handler' in hook
-          ? hook.handler
-          : hook
-      })
-      .filter(Boolean)
+    return plugins.map((p) => getHookHandler(p[hookName])).filter(Boolean)
   }
 
   return {
@@ -133,10 +132,10 @@ export function createPluginHookUtils(
   }
 }
 
-export function getSortedPluginsByHook(
-  hookName: keyof Plugin,
+export function getSortedPluginsByHook<K extends keyof Plugin>(
+  hookName: K,
   plugins: readonly Plugin[],
-): Plugin[] {
+): PluginWithRequiredHook<K>[] {
   const pre: Plugin[] = []
   const normal: Plugin[] = []
   const post: Plugin[] = []
@@ -156,5 +155,23 @@ export function getSortedPluginsByHook(
       normal.push(plugin)
     }
   }
-  return [...pre, ...normal, ...post]
+
+  return [...pre, ...normal, ...post] as PluginWithRequiredHook<K>[]
+}
+
+export function getHookHandler<T extends ObjectHook<Function>>(
+  hook: T,
+): HookHandler<T> {
+  return (typeof hook === 'object' ? hook.handler : hook) as HookHandler<T>
+}
+
+// Same as `@rollup/plugin-alias` default resolver, but we attach additional meta
+// if we can't resolve to something, which will error in `importAnalysis`
+export const viteAliasCustomResolver: ResolverFunction = async function (
+  id,
+  importer,
+  options,
+) {
+  const resolved = await this.resolve(id, importer, options)
+  return resolved || { id, meta: { 'vite:alias': { noResolved: true } } }
 }

@@ -1,8 +1,10 @@
 import path from 'node:path'
 import type * as net from 'node:net'
 import { get as httpGet } from 'node:http'
+import { get as httpsGet } from 'node:https'
 import type * as http from 'node:http'
 import { performance } from 'node:perf_hooks'
+import type { Http2SecureServer } from 'node:http2'
 import connect from 'connect'
 import corsMiddleware from 'cors'
 import colors from 'picocolors'
@@ -26,6 +28,7 @@ import { isDepsOptimizerEnabled, resolveConfig } from '../config'
 import {
   diffDnsOrderChange,
   isInNodeModules,
+  isObject,
   isParentDirectory,
   mergeConfig,
   normalizePath,
@@ -35,6 +38,7 @@ import {
 import { ssrLoadModule } from '../ssr/ssrModuleLoader'
 import { ssrFixStacktrace, ssrRewriteStacktrace } from '../ssr/ssrStacktrace'
 import { ssrTransform } from '../ssr/ssrTransform'
+import { ERR_OUTDATED_OPTIMIZED_DEP } from '../plugins/optimizedDeps'
 import {
   getDepsOptimizer,
   initDepsOptimizer,
@@ -47,7 +51,7 @@ import type { Logger } from '../logger'
 import { printServerUrls } from '../logger'
 import { createNoopWatcher, resolveChokidarOptions } from '../watch'
 import type { PluginContainer } from './pluginContainer'
-import { createPluginContainer } from './pluginContainer'
+import { ERR_CLOSED_SERVER, createPluginContainer } from './pluginContainer'
 import type { WebSocketServer } from './ws'
 import { createWebSocketServer } from './ws'
 import { baseMiddleware } from './middlewares/base'
@@ -109,7 +113,16 @@ export interface ServerOptions extends CommonServerOptions {
    * Create Vite dev server to be used as a middleware in an existing server
    * @default false
    */
-  middlewareMode?: boolean
+  middlewareMode?:
+    | boolean
+    | {
+        /**
+         * Parent server instance to attach to
+         *
+         * This is needed to proxy WebSocket connections to the parent server.
+         */
+        server: http.Server
+      }
   /**
    * Options for files served via '/\@fs/'.
    */
@@ -181,6 +194,8 @@ export type ServerHook = (
   server: ViteDevServer,
 ) => (() => void) | void | Promise<(() => void) | void>
 
+export type HttpServer = http.Server | Http2SecureServer
+
 export interface ViteDevServer {
   /**
    * The resolved vite config object
@@ -199,7 +214,7 @@ export interface ViteDevServer {
    * native Node http server instance
    * will be null in middleware mode
    */
-  httpServer: http.Server | null
+  httpServer: HttpServer | null
   /**
    * chokidar watcher instance
    * https://github.com/paulmillr/chokidar#api
@@ -231,6 +246,12 @@ export interface ViteDevServer {
     url: string,
     options?: TransformOptions,
   ): Promise<TransformResult | null>
+  /**
+   * Same as `transformRequest` but only warm up the URLs so the next request
+   * will already be cached. The function will never throw as it handles and
+   * reports errors internally.
+   */
+  warmupRequest(url: string, options?: TransformOptions): Promise<void>
   /**
    * Apply vite built-in HTML transforms and any plugin HTML transforms.
    */
@@ -298,6 +319,10 @@ export interface ViteDevServer {
   /**
    * @internal
    */
+  _setInternalServer(server: ViteDevServer): void
+  /**
+   * @internal
+   */
   _importGlobMap: Map<string, { affirmed: string[]; negated: string[] }[]>
   /**
    * @internal
@@ -326,6 +351,14 @@ export interface ViteDevServer {
    * @internal
    */
   _shortcutsOptions?: BindCLIShortcutsOptions<ViteDevServer>
+  /**
+   * @internal
+   */
+  _currentServerPort?: number | undefined
+  /**
+   * @internal
+   */
+  _configServerPort?: number | undefined
 }
 
 export interface ResolvedServerUrls {
@@ -383,7 +416,9 @@ export async function _createServer(
 
   let exitProcess: () => void
 
-  const server: ViteDevServer = {
+  const devHtmlTransformFn = createDevHtmlTransformFn(config)
+
+  let server: ViteDevServer = {
     config,
     middlewares,
     httpServer,
@@ -403,7 +438,25 @@ export async function _createServer(
     transformRequest(url, options) {
       return transformRequest(url, server, options)
     },
-    transformIndexHtml: null!, // to be immediately set
+    async warmupRequest(url, options) {
+      await transformRequest(url, server, options).catch((e) => {
+        if (
+          e?.code === ERR_OUTDATED_OPTIMIZED_DEP ||
+          e?.code === ERR_CLOSED_SERVER
+        ) {
+          // these are expected errors
+          return
+        }
+        // Unexpected error, log the issue but avoid an unhandled exception
+        server.config.logger.error(`Pre-transform error: ${e.message}`, {
+          error: e,
+          timestamp: true,
+        })
+      })
+    },
+    transformIndexHtml(url, html, originalUrl) {
+      return devHtmlTransformFn(server, url, html, originalUrl)
+    },
     async ssrLoadModule(url, opts?: { fixStacktrace?: boolean }) {
       if (isDepsOptimizerEnabled(config, true)) {
         await initDevSsrDepsOptimizer(config, server)
@@ -455,7 +508,9 @@ export async function _createServer(
         // preTransformRequests needs to be enabled for this optimization.
         if (server.config.server.preTransformRequests) {
           setTimeout(() => {
-            httpGet(
+            const getMethod = path.startsWith('https:') ? httpsGet : httpGet
+
+            getMethod(
               path,
               {
                 headers: {
@@ -541,6 +596,11 @@ export async function _createServer(
       return server._restartPromise
     },
 
+    _setInternalServer(_server: ViteDevServer) {
+      // Rebind internal the server variable so functions reference the user
+      // server instance after a restart
+      server = _server
+    },
     _restartPromise: null,
     _importGlobMap: new Map(),
     _forceOptimizeOnRestart: false,
@@ -548,8 +608,6 @@ export async function _createServer(
     _fsDenyGlob: picomatch(config.server.fs.deny, { matchBase: true }),
     _shortcutsOptions: undefined,
   }
-
-  server.transformIndexHtml = createDevHtmlTransformFn(server)
 
   if (!middlewareMode) {
     exitProcess = async () => {
@@ -580,12 +638,14 @@ export async function _createServer(
 
   const onFileAddUnlink = async (file: string, isUnlink: boolean) => {
     file = normalizePath(file)
+    await container.watchChange(file, { event: isUnlink ? 'delete' : 'create' })
     await handleFileAddUnlink(file, server, isUnlink)
     await onHMRUpdate(file, true)
   }
 
   watcher.on('change', async (file) => {
     file = normalizePath(file)
+    await container.watchChange(file, { event: 'update' })
     // invalidate module graph cache on file change
     moduleGraph.onFileChange(file)
 
@@ -644,12 +704,16 @@ export async function _createServer(
   // proxy
   const { proxy } = serverConfig
   if (proxy) {
-    middlewares.use(proxyMiddleware(httpServer, proxy, config))
+    const middlewareServer =
+      (isObject(serverConfig.middlewareMode)
+        ? serverConfig.middlewareMode.server
+        : null) || httpServer
+    middlewares.use(proxyMiddleware(middlewareServer, proxy, config))
   }
 
   // base
   if (config.base !== '/') {
-    middlewares.use(baseMiddleware(server))
+    middlewares.use(baseMiddleware(config.rawBase, middlewareMode))
   }
 
   // open in editor support
@@ -669,9 +733,7 @@ export async function _createServer(
   // this applies before the transform middleware so that these files are served
   // as-is without transforms.
   if (config.publicDir) {
-    middlewares.use(
-      servePublicMiddleware(config.publicDir, config.server.headers),
-    )
+    middlewares.use(servePublicMiddleware(server))
   }
 
   // main transform middleware
@@ -679,7 +741,7 @@ export async function _createServer(
 
   // serve static files
   middlewares.use(serveRawFsMiddleware(server))
-  middlewares.use(serveStaticMiddleware(root, server))
+  middlewares.use(serveStaticMiddleware(server))
 
   // html fallback
   if (config.appType === 'spa' || config.appType === 'mpa') {
@@ -758,18 +820,27 @@ async function startServer(
   }
 
   const options = server.config.server
-  const port = inlinePort ?? options.port ?? DEFAULT_DEV_PORT
   const hostname = await resolveHostname(options.host)
+  const configPort = inlinePort ?? options.port
+  // When using non strict port for the dev server, the running port can be different from the config one.
+  // When restarting, the original port may be available but to avoid a switch of URL for the running
+  // browser tabs, we enforce the previously used port, expect if the config port changed.
+  const port =
+    (!configPort || configPort === server._configServerPort
+      ? server._currentServerPort
+      : configPort) ?? DEFAULT_DEV_PORT
+  server._configServerPort = configPort
 
-  await httpServerStart(httpServer, {
+  const serverPort = await httpServerStart(httpServer, {
     port,
     strictPort: options.strictPort,
     host: hostname.host,
     logger: server.config.logger,
   })
+  server._currentServerPort = serverPort
 }
 
-function createServerCloseFn(server: http.Server | null) {
+function createServerCloseFn(server: HttpServer | null) {
   if (!server) {
     return () => {}
   }
@@ -886,7 +957,11 @@ async function restartServer(server: ViteDevServer) {
   await server.close()
 
   // Assign new server props to existing server instance
+  newServer._configServerPort = server._configServerPort
+  newServer._currentServerPort = server._currentServerPort
   Object.assign(server, newServer)
+  // Rebind internal server variable so functions reference the user server
+  newServer._setInternalServer(server)
 
   const {
     logger,

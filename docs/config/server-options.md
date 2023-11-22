@@ -56,7 +56,7 @@ Set to `true` to exit if port is already in use, instead of automatically trying
 
 ## server.https
 
-- **Type:** `boolean | https.ServerOptions`
+- **Type:** `https.ServerOptions`
 
 Enable TLS + HTTP/2. Note this downgrades to TLS only when the [`server.proxy` option](#server-proxy) is also used.
 
@@ -249,7 +249,9 @@ async function createServer() {
     appType: 'custom', // don't include Vite's default HTML handling middlewares
   })
   // Use vite's connect instance as middleware
-  app.use(vite.middlewares)
+  app.use((req, res, next) => {
+    vite.middlewares.handle(req, res, next)
+  })
 
   app.use('*', async (req, res) => {
     // Since `appType` is `'custom'`, should serve response here.
