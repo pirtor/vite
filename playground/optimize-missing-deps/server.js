@@ -1,8 +1,10 @@
 // @ts-check
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import express from 'express'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isTest = process.env.VITEST
 
 export async function createServer(root = process.cwd(), hmrPort) {
@@ -26,9 +28,7 @@ export async function createServer(root = process.cwd(), hmrPort) {
     },
     appType: 'custom',
   })
-  app.use((req, res, next) => {
-    vite.middlewares.handle(req, res, next)
-  })
+  app.use(vite.middlewares)
 
   app.use('*', async (req, res) => {
     try {

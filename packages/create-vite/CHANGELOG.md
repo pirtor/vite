@@ -1,30 +1,9 @@
-## <small>5.0.1 (2023-11-22)</small>
+## 5.1.0 (2023-12-12)
 
-
-
-
-## 5.0.0 (2023-11-22)
-
-* release: create-vite@5.0.0 ([43bb137](https://github.com/pirtor/vite/commit/43bb137))
-* release: create-vite@5.0.0-beta.0 ([22bd67d](https://github.com/pirtor/vite/commit/22bd67d))
-* release: create-vite@5.0.0-beta.1 ([6db3c9b](https://github.com/pirtor/vite/commit/6db3c9b))
-* feat(create-vite): update templates for vite 5 (#15007) ([e208697](https://github.com/pirtor/vite/commit/e208697)), closes [#15007](https://github.com/pirtor/vite/issues/15007)
-* feat(create-vite): update to vite 5.0 beta (#14534) ([97c58e0](https://github.com/pirtor/vite/commit/97c58e0)), closes [#14534](https://github.com/pirtor/vite/issues/14534)
-* fix(create-vite): remove non-standard style (#14451) ([8349d4e](https://github.com/pirtor/vite/commit/8349d4e)), closes [#14451](https://github.com/pirtor/vite/issues/14451)
-* fix(create-vite): remove repeated styles in vue-template (#14766) ([0fed210](https://github.com/pirtor/vite/commit/0fed210)), closes [#14766](https://github.com/pirtor/vite/issues/14766)
-* fix(deps): update all non-major dependencies (#14460) ([b77bff0](https://github.com/pirtor/vite/commit/b77bff0)), closes [#14460](https://github.com/pirtor/vite/issues/14460)
-* fix(deps): update all non-major dependencies (#14510) ([eb204fd](https://github.com/pirtor/vite/commit/eb204fd)), closes [#14510](https://github.com/pirtor/vite/issues/14510)
-* fix(deps): update all non-major dependencies (#14559) ([6868480](https://github.com/pirtor/vite/commit/6868480)), closes [#14559](https://github.com/pirtor/vite/issues/14559)
-* fix(deps): update all non-major dependencies (#14635) ([21017a9](https://github.com/pirtor/vite/commit/21017a9)), closes [#14635](https://github.com/pirtor/vite/issues/14635)
-* fix(deps): update all non-major dependencies (#14729) ([d5d96e7](https://github.com/pirtor/vite/commit/d5d96e7)), closes [#14729](https://github.com/pirtor/vite/issues/14729)
-* fix(deps): update all non-major dependencies (#14883) ([e5094e5](https://github.com/pirtor/vite/commit/e5094e5)), closes [#14883](https://github.com/pirtor/vite/issues/14883)
-* fix(deps): update all non-major dependencies (#14961) ([0bb3995](https://github.com/pirtor/vite/commit/0bb3995)), closes [#14961](https://github.com/pirtor/vite/issues/14961)
-* fix(deps): update dependency lit to v3 (#14638) ([c81f3da](https://github.com/pirtor/vite/commit/c81f3da)), closes [#14638](https://github.com/pirtor/vite/issues/14638)
-* chore: update manually bumped deps (#14430) ([995c4b6](https://github.com/pirtor/vite/commit/995c4b6)), closes [#14430](https://github.com/pirtor/vite/issues/14430)
-* chore(create-vite): update dependencies (#14698) ([bd82c30](https://github.com/pirtor/vite/commit/bd82c30)), closes [#14698](https://github.com/pirtor/vite/issues/14698)
-* chore(deps): update dependency eslint-plugin-react-refresh to ^0.4.4 (#14795) ([7881457](https://github.com/pirtor/vite/commit/7881457)), closes [#14795](https://github.com/pirtor/vite/issues/14795)
-* feat!: rollup v4 (#14508) ([dee6067](https://github.com/pirtor/vite/commit/dee6067)), closes [#14508](https://github.com/pirtor/vite/issues/14508)
-* docs(create-vite): add qwik and qwik-ts to the list (#14624) ([de87fe4](https://github.com/pirtor/vite/commit/de87fe4)), closes [#14624](https://github.com/pirtor/vite/issues/14624)
+* fix(deps): update all non-major dependencies (#15233) ([ad3adda](https://github.com/vitejs/vite/commit/ad3adda)), closes [#15233](https://github.com/vitejs/vite/issues/15233)
+* fix(deps): update all non-major dependencies (#15304) ([bb07f60](https://github.com/vitejs/vite/commit/bb07f60)), closes [#15304](https://github.com/vitejs/vite/issues/15304)
+* feat(cli): allow initializing non-empty directory (#15272) ([00669e1](https://github.com/vitejs/vite/commit/00669e1)), closes [#15272](https://github.com/vitejs/vite/issues/15272)
+* chore(deps): update all non-major dependencies (#15145) ([7ff2c0a](https://github.com/vitejs/vite/commit/7ff2c0a)), closes [#15145](https://github.com/vitejs/vite/issues/15145)
 
 
 

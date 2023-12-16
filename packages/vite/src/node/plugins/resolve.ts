@@ -43,6 +43,8 @@ import { optimizedDepInfoFromFile, optimizedDepInfoFromId } from '../optimizer'
 import type { DepsOptimizer } from '../optimizer'
 import type { SSROptions } from '..'
 import type { PackageCache, PackageData } from '../packages'
+import type { FsUtils } from '../fsUtils'
+import { commonFsUtils } from '../fsUtils'
 import {
   findNearestMainPackageData,
   findNearestPackageData,
@@ -92,6 +94,7 @@ export interface InternalResolveOptions extends Required<ResolveOptions> {
   isProduction: boolean
   ssrConfig?: SSROptions
   packageCache?: PackageCache
+  fsUtils?: FsUtils
   /**
    * src code mode also attempts the following:
    * - resolving /xxx as URLs
@@ -263,7 +266,7 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
           // Inject the current browserHash version if the path doesn't have one
           if (
             !resolveOptions.isBuild &&
-            !normalizedFsPath.match(DEP_VERSION_RE)
+            !DEP_VERSION_RE.test(normalizedFsPath)
           ) {
             const browserHash = optimizedDepInfoFromFile(
               depsOptimizer.metadata,
@@ -501,7 +504,7 @@ function ensureVersionQuery(
     // file path after symlinks resolution
     const isNodeModule = isInNodeModules(id) || isInNodeModules(resolved)
 
-    if (isNodeModule && !resolved.match(DEP_VERSION_RE)) {
+    if (isNodeModule && !DEP_VERSION_RE.test(resolved)) {
       const versionHash = depsOptimizer.metadata.browserHash
       if (versionHash && isOptimizable(resolved, depsOptimizer.options)) {
         resolved = injectQuery(resolved, `v=${versionHash}`)
@@ -566,25 +569,29 @@ function tryCleanFsResolve(
 ): string | undefined {
   const { tryPrefix, extensions, preserveSymlinks } = options
 
-  const fileStat = tryStatSync(file)
+  const fsUtils = options.fsUtils ?? commonFsUtils
 
-  // Try direct match first
-  if (fileStat?.isFile()) return getRealPath(file, options.preserveSymlinks)
+  // Optimization to get the real type or file type (directory, file, other)
+  const fileResult = fsUtils.tryResolveRealFileOrType(
+    file,
+    options.preserveSymlinks,
+  )
+
+  if (fileResult?.path) return fileResult.path
 
   let res: string | undefined
 
   // If path.dirname is a valid directory, try extensions and ts resolution logic
   const possibleJsToTs = options.isFromTsImporter && isPossibleTsOutput(file)
-  if (possibleJsToTs || extensions.length || tryPrefix) {
+  if (possibleJsToTs || options.extensions.length || tryPrefix) {
     const dirPath = path.dirname(file)
-    const dirStat = tryStatSync(dirPath)
-    if (dirStat?.isDirectory()) {
+    if (fsUtils.isDirectory(dirPath)) {
       if (possibleJsToTs) {
         // try resolve .js, .mjs, .cjs or .jsx import to typescript file
         const fileExt = path.extname(file)
         const fileName = file.slice(0, -fileExt.length)
         if (
-          (res = tryResolveRealFile(
+          (res = fsUtils.tryResolveRealFile(
             fileName + fileExt.replace('js', 'ts'),
             preserveSymlinks,
           ))
@@ -593,13 +600,16 @@ function tryCleanFsResolve(
         // for .js, also try .tsx
         if (
           fileExt === '.js' &&
-          (res = tryResolveRealFile(fileName + '.tsx', preserveSymlinks))
+          (res = fsUtils.tryResolveRealFile(
+            fileName + '.tsx',
+            preserveSymlinks,
+          ))
         )
           return res
       }
 
       if (
-        (res = tryResolveRealFileWithExtensions(
+        (res = fsUtils.tryResolveRealFileWithExtensions(
           file,
           extensions,
           preserveSymlinks,
@@ -610,10 +620,11 @@ function tryCleanFsResolve(
       if (tryPrefix) {
         const prefixed = `${dirPath}/${options.tryPrefix}${path.basename(file)}`
 
-        if ((res = tryResolveRealFile(prefixed, preserveSymlinks))) return res
+        if ((res = fsUtils.tryResolveRealFile(prefixed, preserveSymlinks)))
+          return res
 
         if (
-          (res = tryResolveRealFileWithExtensions(
+          (res = fsUtils.tryResolveRealFileWithExtensions(
             prefixed,
             extensions,
             preserveSymlinks,
@@ -624,14 +635,14 @@ function tryCleanFsResolve(
     }
   }
 
-  if (tryIndex && fileStat) {
+  if (tryIndex && fileResult?.type === 'directory') {
     // Path points to a directory, check for package.json and entry and /index file
     const dirPath = file
 
     if (!skipPackageJson) {
       let pkgPath = `${dirPath}/package.json`
       try {
-        if (fs.existsSync(pkgPath)) {
+        if (fsUtils.existsSync(pkgPath)) {
           if (!options.preserveSymlinks) {
             pkgPath = safeRealpathSync(pkgPath)
           }
@@ -647,7 +658,7 @@ function tryCleanFsResolve(
     }
 
     if (
-      (res = tryResolveRealFileWithExtensions(
+      (res = fsUtils.tryResolveRealFileWithExtensions(
         `${dirPath}/index`,
         extensions,
         preserveSymlinks,
@@ -657,7 +668,7 @@ function tryCleanFsResolve(
 
     if (tryPrefix) {
       if (
-        (res = tryResolveRealFileWithExtensions(
+        (res = fsUtils.tryResolveRealFileWithExtensions(
           `${dirPath}/${options.tryPrefix}index`,
           extensions,
           preserveSymlinks,
@@ -665,25 +676,6 @@ function tryCleanFsResolve(
       )
         return res
     }
-  }
-}
-
-function tryResolveRealFile(
-  file: string,
-  preserveSymlinks: boolean,
-): string | undefined {
-  const stat = tryStatSync(file)
-  if (stat?.isFile()) return getRealPath(file, preserveSymlinks)
-}
-
-function tryResolveRealFileWithExtensions(
-  filePath: string,
-  extensions: string[],
-  preserveSymlinks: boolean,
-): string | undefined {
-  for (const ext of extensions) {
-    const res = tryResolveRealFile(filePath + ext, preserveSymlinks)
-    if (res) return res
   }
 }
 
@@ -982,53 +974,17 @@ export function resolvePackageEntry(
       )
     }
 
-    // handle edge case with browser and module field semantics
-    if (!entryPoint && targetWeb && options.mainFields.includes('browser')) {
-      // check browser field
-      // https://github.com/defunctzombie/package-browser-field-spec
-      const browserEntry =
-        typeof data.browser === 'string'
-          ? data.browser
-          : isObject(data.browser) && data.browser['.']
-      if (browserEntry) {
-        // check if the package also has a "module" field.
-        if (
-          !options.isRequire &&
-          options.mainFields.includes('module') &&
-          typeof data.module === 'string' &&
-          data.module !== browserEntry
-        ) {
-          // if both are present, we may have a problem: some package points both
-          // to ESM, with "module" targeting Node.js, while some packages points
-          // "module" to browser ESM and "browser" to UMD/IIFE.
-          // the heuristics here is to actually read the browser entry when
-          // possible and check for hints of ESM. If it is not ESM, prefer "module"
-          // instead; Otherwise, assume it's ESM and use it.
-          const resolvedBrowserEntry = tryFsResolve(
-            path.join(dir, browserEntry),
-            options,
-          )
-          if (resolvedBrowserEntry) {
-            const content = fs.readFileSync(resolvedBrowserEntry, 'utf-8')
-            if (hasESMSyntax(content)) {
-              // likely ESM, prefer browser
-              entryPoint = browserEntry
-            } else {
-              // non-ESM, UMD or IIFE or CJS(!!! e.g. firebase 7.x), prefer module
-              entryPoint = data.module
-            }
-          }
-        } else {
-          entryPoint = browserEntry
-        }
-      }
-    }
-
     // fallback to mainFields if still not resolved
     if (!entryPoint) {
       for (const field of options.mainFields) {
-        if (field === 'browser') continue // already checked above
-        if (typeof data[field] === 'string') {
+        if (field === 'browser') {
+          if (targetWeb) {
+            entryPoint = tryResolveBrowserEntry(dir, data, options)
+            if (entryPoint) {
+              break
+            }
+          }
+        } else if (typeof data[field] === 'string') {
           entryPoint = data[field]
           break
         }
@@ -1257,6 +1213,53 @@ function tryResolveBrowserMapping(
   }
 }
 
+function tryResolveBrowserEntry(
+  dir: string,
+  data: PackageData['data'],
+  options: InternalResolveOptions,
+) {
+  // handle edge case with browser and module field semantics
+
+  // check browser field
+  // https://github.com/defunctzombie/package-browser-field-spec
+  const browserEntry =
+    typeof data.browser === 'string'
+      ? data.browser
+      : isObject(data.browser) && data.browser['.']
+  if (browserEntry) {
+    // check if the package also has a "module" field.
+    if (
+      !options.isRequire &&
+      options.mainFields.includes('module') &&
+      typeof data.module === 'string' &&
+      data.module !== browserEntry
+    ) {
+      // if both are present, we may have a problem: some package points both
+      // to ESM, with "module" targeting Node.js, while some packages points
+      // "module" to browser ESM and "browser" to UMD/IIFE.
+      // the heuristics here is to actually read the browser entry when
+      // possible and check for hints of ESM. If it is not ESM, prefer "module"
+      // instead; Otherwise, assume it's ESM and use it.
+      const resolvedBrowserEntry = tryFsResolve(
+        path.join(dir, browserEntry),
+        options,
+      )
+      if (resolvedBrowserEntry) {
+        const content = fs.readFileSync(resolvedBrowserEntry, 'utf-8')
+        if (hasESMSyntax(content)) {
+          // likely ESM, prefer browser
+          return browserEntry
+        } else {
+          // non-ESM, UMD or IIFE or CJS(!!! e.g. firebase 7.x), prefer module
+          return data.module
+        }
+      }
+    } else {
+      return browserEntry
+    }
+  }
+}
+
 /**
  * given a relative path in pkg dir,
  * return a relative path in pkg dir,
@@ -1285,11 +1288,4 @@ function mapWithBrowserField(
 
 function equalWithoutSuffix(path: string, key: string, suffix: string) {
   return key.endsWith(suffix) && key.slice(0, -suffix.length) === path
-}
-
-function getRealPath(resolved: string, preserveSymlinks?: boolean): string {
-  if (!preserveSymlinks && browserExternalId !== resolved) {
-    resolved = safeRealpathSync(resolved)
-  }
-  return normalizePath(resolved)
 }
