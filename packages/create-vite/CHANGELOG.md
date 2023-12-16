@@ -1,3 +1,26 @@
+## 5.1.0 (2023-12-16)
+
+* release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
+* release: create-vite@4.4.3 ([cd586ca](https://github.com/pirtor/vite/commit/cd586ca))
+* release: create-vite@4.4.4 ([76a7879](https://github.com/pirtor/vite/commit/76a7879))
+* release: create-vite@4.4.4 ([63d6bd7](https://github.com/pirtor/vite/commit/63d6bd7))
+* release: create-vite@4.4.5 ([c7e2f9f](https://github.com/pirtor/vite/commit/c7e2f9f))
+* release: create-vite@4.4.6 ([cc05868](https://github.com/pirtor/vite/commit/cc05868))
+* release: create-vite@4.4.7 ([120e6b1](https://github.com/pirtor/vite/commit/120e6b1))
+* release: create-vite@5.0.0 ([ae0a803](https://github.com/pirtor/vite/commit/ae0a803))
+* release: create-vite@5.0.1 ([b8e7c28](https://github.com/pirtor/vite/commit/b8e7c28))
+* feat: update template of react-ts ([0667fd0](https://github.com/pirtor/vite/commit/0667fd0))
+* feat: update template of vanilla-ts ([117a2ee](https://github.com/pirtor/vite/commit/117a2ee))
+* feat(create-vite): update template ([a3d1040](https://github.com/pirtor/vite/commit/a3d1040))
+* feat(create-vite): update templates ([5d02151](https://github.com/pirtor/vite/commit/5d02151))
+* chore: update npm package info ([a52aff2](https://github.com/pirtor/vite/commit/a52aff2))
+* chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
+* fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
+* fix: update prettier & eslint configuration ([70e659e](https://github.com/pirtor/vite/commit/70e659e))
+* style: formate ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
+
+
+
 ## 5.1.0 (2023-12-12)
 
 * fix(deps): update all non-major dependencies (#15233) ([ad3adda](https://github.com/vitejs/vite/commit/ad3adda)), closes [#15233](https://github.com/vitejs/vite/issues/15233)
