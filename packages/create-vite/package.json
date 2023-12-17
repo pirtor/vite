@@ -1,6 +1,6 @@
 {
   "name": "@pirtor/create-vite",
-  "version": "5.1.1",
+  "version": "5.1.2-beta",
   "type": "module",
   "license": "MIT",
   "author": "Evan You, fork and modified by Pirtor",

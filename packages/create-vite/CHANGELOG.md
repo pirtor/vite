@@ -1,3 +1,9 @@
+## <small>5.1.2-beta (2023-12-17)</small>
+
+* feat: add template of vscode extension ([2624df0](https://github.com/pirtor/vite/commit/2624df0))
+
+
+
 ## <small>5.1.1 (2023-12-16)</small>
 
 * release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
