@@ -41,6 +41,18 @@ type FrameworkVariant = {
 
 const FRAMEWORKS: Framework[] = [
   {
+    name: 'vscode extension',
+    display: '⟡ Vscode Extension',
+    color: blue,
+    variants: [
+      {
+        name: 'vscode-react-ts',
+        display: '⟡ React TypeScript',
+        color: blue,
+      },
+    ],
+  },
+  {
     name: 'vanilla',
     display: '⟡ Vanilla',
     color: yellow,
