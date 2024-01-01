@@ -1,3 +1,9 @@
+## <small>5.1.3 (2024-01-01)</small>
+
+* fix: typo ([b5ffd75](https://github.com/pirtor/vite/commit/b5ffd75))
+
+
+
 ## <small>5.1.2 (2024-01-01)</small>
 
 * feat(create-vite): setup shadcn-ui for template-react-ts ([2f86de4](https://github.com/pirtor/vite/commit/2f86de4))
