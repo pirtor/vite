@@ -1,3 +1,10 @@
+import { Button } from "@/components/ui/button";
+
 export default function App() {
-  return <h1 className="text-3xl font-bold text-blue-400">Hello world!</h1>;
+  return (
+    <>
+      <h1 className="tw-text-4xl tw-font-extrabold">Hello World</h1>
+      <Button>Click</Button>
+    </>
+  );
 }
