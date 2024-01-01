@@ -1,3 +1,11 @@
+## <small>5.1.2 (2024-01-01)</small>
+
+* feat(create-vite): setup shadcn-ui for template-react-ts ([2f86de4](https://github.com/pirtor/vite/commit/2f86de4))
+* feat(create-vite): setup tailwind for template-vanilla-ts ([371610b](https://github.com/pirtor/vite/commit/371610b))
+* chore(deps): update dependency @vitejs/plugin-vue to v5 (#15474) ([17857e7](https://github.com/pirtor/vite/commit/17857e7)), closes [#15474](https://github.com/pirtor/vite/issues/15474)
+
+
+
 ## <small>5.1.1 (2023-12-16)</small>
 
 * release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
