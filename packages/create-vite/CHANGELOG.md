@@ -26,7 +26,7 @@
 * chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
 * fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
 * fix: update prettier & eslint configuration ([70e659e](https://github.com/pirtor/vite/commit/70e659e))
-* style: formate ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
+* style: format ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
 
 
 
@@ -49,7 +49,7 @@
 * chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
 * fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
 * fix: update prettier & eslint configuration ([70e659e](https://github.com/pirtor/vite/commit/70e659e))
-* style: formate ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
+* style: format ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
 
 
 

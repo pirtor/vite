@@ -9,7 +9,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
-    "formate": "prettier . --write",
+    "format": "prettier . --write",
     "test": "vitest"
   },
   "devDependencies": {
