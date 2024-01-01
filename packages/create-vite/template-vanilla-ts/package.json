@@ -8,16 +8,21 @@
     "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "formate": "prettier . --write",
     "test": "vitest"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.1.0",
     "@typescript-eslint/parser": "^6.1.0",
+    "autoprefixer": "^10.4.16",
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
+    "postcss": "^8.4.32",
     "prettier": "^3.0.0",
+    "tailwindcss": "^3.4.0",
     "typescript": "^5.2.2",
-    "vite": "^5.0.10"
+    "vite": "^5.0.10",
+    "vitest": "^1.1.1"
   }
 }
