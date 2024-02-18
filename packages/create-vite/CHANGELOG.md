@@ -1,61 +1,14 @@
-## <small>5.1.3 (2024-01-01)</small>
+## 5.2.0 (2024-02-08)
 
-* fix: typo ([b5ffd75](https://github.com/pirtor/vite/commit/b5ffd75))
-
-
-
-## <small>5.1.2 (2024-01-01)</small>
-
-* feat(create-vite): setup shadcn-ui for template-react-ts ([2f86de4](https://github.com/pirtor/vite/commit/2f86de4))
-* feat(create-vite): setup tailwind for template-vanilla-ts ([371610b](https://github.com/pirtor/vite/commit/371610b))
-* chore(deps): update dependency @vitejs/plugin-vue to v5 (#15474) ([17857e7](https://github.com/pirtor/vite/commit/17857e7)), closes [#15474](https://github.com/pirtor/vite/issues/15474)
-
-
-
-## <small>5.1.1 (2023-12-16)</small>
-
-* release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
-* release: create-vite@4.4.3 ([cd586ca](https://github.com/pirtor/vite/commit/cd586ca))
-* release: create-vite@4.4.4 ([76a7879](https://github.com/pirtor/vite/commit/76a7879))
-* release: create-vite@4.4.4 ([63d6bd7](https://github.com/pirtor/vite/commit/63d6bd7))
-* release: create-vite@4.4.5 ([c7e2f9f](https://github.com/pirtor/vite/commit/c7e2f9f))
-* release: create-vite@4.4.6 ([cc05868](https://github.com/pirtor/vite/commit/cc05868))
-* release: create-vite@4.4.7 ([120e6b1](https://github.com/pirtor/vite/commit/120e6b1))
-* release: create-vite@5.0.0 ([ae0a803](https://github.com/pirtor/vite/commit/ae0a803))
-* release: create-vite@5.0.1 ([b8e7c28](https://github.com/pirtor/vite/commit/b8e7c28))
-* release: create-vite@5.1.0 ([ddf5e4c](https://github.com/pirtor/vite/commit/ddf5e4c))
-* feat: update template of react-ts ([0667fd0](https://github.com/pirtor/vite/commit/0667fd0))
-* feat: update template of vanilla-ts ([117a2ee](https://github.com/pirtor/vite/commit/117a2ee))
-* feat(create-vite): update template ([a3d1040](https://github.com/pirtor/vite/commit/a3d1040))
-* feat(create-vite): update templates ([5d02151](https://github.com/pirtor/vite/commit/5d02151))
-* chore: update npm package info ([a52aff2](https://github.com/pirtor/vite/commit/a52aff2))
-* chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
-* fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
-* fix: update prettier & eslint configuration ([70e659e](https://github.com/pirtor/vite/commit/70e659e))
-* style: format ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
-
-
-
-## 5.1.0 (2023-12-16)
-
-* release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
-* release: create-vite@4.4.3 ([cd586ca](https://github.com/pirtor/vite/commit/cd586ca))
-* release: create-vite@4.4.4 ([76a7879](https://github.com/pirtor/vite/commit/76a7879))
-* release: create-vite@4.4.4 ([63d6bd7](https://github.com/pirtor/vite/commit/63d6bd7))
-* release: create-vite@4.4.5 ([c7e2f9f](https://github.com/pirtor/vite/commit/c7e2f9f))
-* release: create-vite@4.4.6 ([cc05868](https://github.com/pirtor/vite/commit/cc05868))
-* release: create-vite@4.4.7 ([120e6b1](https://github.com/pirtor/vite/commit/120e6b1))
-* release: create-vite@5.0.0 ([ae0a803](https://github.com/pirtor/vite/commit/ae0a803))
-* release: create-vite@5.0.1 ([b8e7c28](https://github.com/pirtor/vite/commit/b8e7c28))
-* feat: update template of react-ts ([0667fd0](https://github.com/pirtor/vite/commit/0667fd0))
-* feat: update template of vanilla-ts ([117a2ee](https://github.com/pirtor/vite/commit/117a2ee))
-* feat(create-vite): update template ([a3d1040](https://github.com/pirtor/vite/commit/a3d1040))
-* feat(create-vite): update templates ([5d02151](https://github.com/pirtor/vite/commit/5d02151))
-* chore: update npm package info ([a52aff2](https://github.com/pirtor/vite/commit/a52aff2))
-* chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
-* fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
-* fix: update prettier & eslint configuration ([70e659e](https://github.com/pirtor/vite/commit/70e659e))
-* style: format ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
+* fix(create-vite): turn off `react/jsx-no-target-blank` ESLint rule in React JS template (#15672) ([a6f39e8](https://github.com/vitejs/vite/commit/a6f39e8)), closes [#15672](https://github.com/vitejs/vite/issues/15672)
+* fix(deps): update all non-major dependencies (#15375) ([ab56227](https://github.com/vitejs/vite/commit/ab56227)), closes [#15375](https://github.com/vitejs/vite/issues/15375)
+* fix(deps): update all non-major dependencies (#15603) ([109fb80](https://github.com/vitejs/vite/commit/109fb80)), closes [#15603](https://github.com/vitejs/vite/issues/15603)
+* fix(deps): update all non-major dependencies (#15675) ([4d9363a](https://github.com/vitejs/vite/commit/4d9363a)), closes [#15675](https://github.com/vitejs/vite/issues/15675)
+* fix(deps): update all non-major dependencies (#15803) ([e0a6ef2](https://github.com/vitejs/vite/commit/e0a6ef2)), closes [#15803](https://github.com/vitejs/vite/issues/15803)
+* feat(create-vite): allow overwrite in command line (#15808) ([1882c73](https://github.com/vitejs/vite/commit/1882c73)), closes [#15808](https://github.com/vitejs/vite/issues/15808)
+* feat(create-vite): set "strict: true" in tsconfig.node.json (#15820) ([5e5ca7d](https://github.com/vitejs/vite/commit/5e5ca7d)), closes [#15820](https://github.com/vitejs/vite/issues/15820)
+* docs: changed bunx create-vite to bun create vite (#15646) ([f3c11bb](https://github.com/vitejs/vite/commit/f3c11bb)), closes [#15646](https://github.com/vitejs/vite/issues/15646)
+* chore(deps): update dependency @vitejs/plugin-vue to v5 (#15474) ([17857e7](https://github.com/vitejs/vite/commit/17857e7)), closes [#15474](https://github.com/vitejs/vite/issues/15474)
 
 
 

@@ -254,6 +254,10 @@ async function init() {
     'projectName' | 'overwrite' | 'packageName' | 'framework' | 'variant'
   >
 
+  prompts.override({
+    overwrite: argv.overwrite,
+  })
+
   try {
     result = await prompts(
       [
