@@ -1,3 +1,50 @@
+# @pirtor/create-vite <a href="https://npmjs.com/package/@pirtor/create-vite"><img src="https://img.shields.io/npm/v/@pirtor/create-vite" alt="npm package"></a>
+
+## What is this
+
+This project is forked from `create-vite`, and the following template has been adjusted to fulfill my needs for quickly starting a demo project that provides a good developer experience and uses the technologies I commonly use.
+
+- `vanilla-ts`
+- `react-ts`
+- `react-swc-ts`
+
+Each template includes `TypeScript`, `ESLint`, `Prettier`, `Tailwind CSS`.
+And React templates come with `Shadcn UI` Additionally.
+`Husky`, `Lint-staged` or `Commitlint` is not included because I only use this to write demo projects. However, if your project grows, consider using them.
+
+> **Note:**
+> If you have the same requirements and share the same tech stack, feel free to submit a pull request (PR). But as this project was built for personal use, PRs are not guaranteed to be merged. Also the templates may change over time. Consider releasing your own version if this happen.
+
+Try this and give me a star if you like it.
+
+With PNPM (I recommend using pnpm, as I am a big fan of it):
+
+```bash
+$ pnpm create @pirtor/vite
+```
+
+With NPM:
+
+```bash
+$ npm create @pirtor/vite
+```
+
+With Yarn:
+
+```bash
+$ yarn create @pirtor/vite
+```
+
+With Bun (I haven’t tried this yet):
+
+```bash
+$ bun create @pirtor/vite
+```
+
+Then follow the prompts!
+
+---
+
 # create-vite <a href="https://npmjs.com/package/create-vite"><img src="https://img.shields.io/npm/v/create-vite" alt="npm package"></a>
 
 ## Scaffolding Your First Vite Project
