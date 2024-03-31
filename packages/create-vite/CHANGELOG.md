@@ -1,3 +1,41 @@
+## <small>5.2.4 (2024-03-31)</small>
+
+* release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
+* release: create-vite@4.4.3 ([cd586ca](https://github.com/pirtor/vite/commit/cd586ca))
+* release: create-vite@4.4.4 ([76a7879](https://github.com/pirtor/vite/commit/76a7879))
+* release: create-vite@4.4.4 ([63d6bd7](https://github.com/pirtor/vite/commit/63d6bd7))
+* release: create-vite@4.4.5 ([c7e2f9f](https://github.com/pirtor/vite/commit/c7e2f9f))
+* release: create-vite@4.4.6 ([cc05868](https://github.com/pirtor/vite/commit/cc05868))
+* release: create-vite@4.4.7 ([120e6b1](https://github.com/pirtor/vite/commit/120e6b1))
+* release: create-vite@5.0.0 ([ae0a803](https://github.com/pirtor/vite/commit/ae0a803))
+* release: create-vite@5.0.1 ([b8e7c28](https://github.com/pirtor/vite/commit/b8e7c28))
+* release: create-vite@5.1.0 ([ddf5e4c](https://github.com/pirtor/vite/commit/ddf5e4c))
+* release: create-vite@5.1.1 ([0af4766](https://github.com/pirtor/vite/commit/0af4766))
+* release: create-vite@5.1.2 ([4e88085](https://github.com/pirtor/vite/commit/4e88085))
+* release: create-vite@5.1.3 ([9be0ebf](https://github.com/pirtor/vite/commit/9be0ebf))
+* release: create-vite@5.2.1 ([b23ead0](https://github.com/pirtor/vite/commit/b23ead0))
+* release: create-vite@5.2.2 ([e8c1716](https://github.com/pirtor/vite/commit/e8c1716))
+* release: create-vite@5.2.3 ([10a10fd](https://github.com/pirtor/vite/commit/10a10fd))
+* fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
+* fix: typo ([b5ffd75](https://github.com/pirtor/vite/commit/b5ffd75))
+* fix: update prettier & eslint configuration ([70e659e](https://github.com/pirtor/vite/commit/70e659e))
+* fix(deps): update all non-major dependencies (#16258) ([7caef42](https://github.com/pirtor/vite/commit/7caef42)), closes [#16258](https://github.com/pirtor/vite/issues/16258)
+* docs: update readme ([b61e3d7](https://github.com/pirtor/vite/commit/b61e3d7))
+* docs(create-vite): link to Vue docs for IDE support info (#16225) ([520bb89](https://github.com/pirtor/vite/commit/520bb89)), closes [#16225](https://github.com/pirtor/vite/issues/16225)
+* chore: update npm package info ([a52aff2](https://github.com/pirtor/vite/commit/a52aff2))
+* chore: update vscode config in templates ([dd74977](https://github.com/pirtor/vite/commit/dd74977))
+* chore(create-vite): fix repository info ([d7ac36c](https://github.com/pirtor/vite/commit/d7ac36c))
+* feat: remove prefix of tailwind ([cf019cf](https://github.com/pirtor/vite/commit/cf019cf))
+* feat: update template of react-ts ([0667fd0](https://github.com/pirtor/vite/commit/0667fd0))
+* feat: update template of vanilla-ts ([117a2ee](https://github.com/pirtor/vite/commit/117a2ee))
+* feat(create-vite): setup shadcn-ui for template-react-ts ([2f86de4](https://github.com/pirtor/vite/commit/2f86de4))
+* feat(create-vite): setup tailwind for template-vanilla-ts ([371610b](https://github.com/pirtor/vite/commit/371610b))
+* feat(create-vite): update template ([a3d1040](https://github.com/pirtor/vite/commit/a3d1040))
+* feat(create-vite): update templates ([5d02151](https://github.com/pirtor/vite/commit/5d02151))
+* style: formate ([28ce2bd](https://github.com/pirtor/vite/commit/28ce2bd))
+
+
+
 ## <small>5.2.3 (2024-03-31)</small>
 
 * fix: .npmrc file accidentally deleted during npm package publishing ([57cabbf](https://github.com/pirtor/vite/commit/57cabbf))
