@@ -259,7 +259,9 @@ function orderedDependencies(deps: Record<string, string>) {
 function globEntries(pattern: string | string[], config: ResolvedConfig) {
   const resolvedPatterns = arraify(pattern)
   if (resolvedPatterns.every((str) => !glob.isDynamicPattern(str))) {
-    return resolvedPatterns.map((p) => path.resolve(config.root, p))
+    return resolvedPatterns.map((p) =>
+      normalizePath(path.resolve(config.root, p)),
+    )
   }
   return glob(pattern, {
     cwd: config.root,
@@ -407,12 +409,10 @@ function esbuildScanPlugin(
         // Avoid matching the content of the comment
         raw = raw.replace(commentRE, '<!---->')
         const isHtml = p.endsWith('.html')
-        scriptRE.lastIndex = 0
         let js = ''
         let scriptId = 0
-        let match: RegExpExecArray | null
-        while ((match = scriptRE.exec(raw))) {
-          const [, openTag, content] = match
+        const matches = raw.matchAll(scriptRE)
+        for (const [, openTag, content] of matches) {
           const typeMatch = openTag.match(typeRE)
           const type =
             typeMatch && (typeMatch[1] || typeMatch[2] || typeMatch[3])

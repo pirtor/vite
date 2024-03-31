@@ -49,6 +49,7 @@ import {
   combineSourcemaps,
   createSerialPromiseQueue,
   emptyCssComments,
+  encodeURIPath,
   generateCodeFrame,
   getHash,
   getPackageManagerCommand,
@@ -542,7 +543,7 @@ export function cssPostPlugin(config: ResolvedConfig): Plugin {
         map: { mappings: '' },
         // avoid the css module from being tree-shaken so that we can retrieve
         // it in renderChunk()
-        moduleSideEffects: inlined ? false : 'no-treeshake',
+        moduleSideEffects: modulesCode || inlined ? false : 'no-treeshake',
       }
     },
 
@@ -593,13 +594,15 @@ export function cssPostPlugin(config: ResolvedConfig): Plugin {
         chunkCSS = chunkCSS.replace(assetUrlRE, (_, fileHash, postfix = '') => {
           const filename = this.getFileName(fileHash) + postfix
           chunk.viteMetadata!.importedAssets.add(cleanUrl(filename))
-          return toOutputFilePathInCss(
-            filename,
-            'asset',
-            cssAssetName,
-            'css',
-            config,
-            toRelative,
+          return encodeURIPath(
+            toOutputFilePathInCss(
+              filename,
+              'asset',
+              cssAssetName,
+              'css',
+              config,
+              toRelative,
+            ),
           )
         })
         // resolve public URL from CSS paths
@@ -610,13 +613,15 @@ export function cssPostPlugin(config: ResolvedConfig): Plugin {
           )
           chunkCSS = chunkCSS.replace(publicAssetUrlRE, (_, hash) => {
             const publicUrl = publicAssetUrlMap.get(hash)!.slice(1)
-            return toOutputFilePathInCss(
-              publicUrl,
-              'public',
-              cssAssetName,
-              'css',
-              config,
-              () => `${relativePathToPublicFromCSS}/${publicUrl}`,
+            return encodeURIPath(
+              toOutputFilePathInCss(
+                publicUrl,
+                'public',
+                cssAssetName,
+                'css',
+                config,
+                () => `${relativePathToPublicFromCSS}/${publicUrl}`,
+              ),
             )
           })
         }
@@ -711,7 +716,7 @@ export function cssPostPlugin(config: ResolvedConfig): Plugin {
           )
           const replacementString =
             typeof replacement === 'string'
-              ? JSON.stringify(replacement).slice(1, -1)
+              ? JSON.stringify(encodeURIPath(replacement)).slice(1, -1)
               : `"+${replacement.runtime}+"`
           s.update(start, end, replacementString)
         }
@@ -2749,12 +2754,13 @@ async function compileLightningCSS(
     switch (dep.type) {
       case 'url':
         if (skipUrlReplacer(dep.url)) {
-          css = css.replace(dep.placeholder, dep.url)
+          css = css.replace(dep.placeholder, () => dep.url)
           break
         }
         deps.add(dep.url)
         if (urlReplacer) {
-          css = css.replace(dep.placeholder, await urlReplacer(dep.url, id))
+          const replaceUrl = await urlReplacer(dep.url, id)
+          css = css.replace(dep.placeholder, () => replaceUrl)
         }
         break
       default:
