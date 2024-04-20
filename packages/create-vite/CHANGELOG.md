@@ -1,3 +1,11 @@
+## <small>5.2.5 (2024-04-20)</small>
+
+* chore: stop using npmmirror as default registry ([651ae6b](https://github.com/pirtor/vite/commit/651ae6b))
+* chore(deps): update all non-major dependencies (#16325) ([a78e265](https://github.com/pirtor/vite/commit/a78e265)), closes [#16325](https://github.com/pirtor/vite/issues/16325)
+* fix(deps): update all non-major dependencies (#16376) ([58a2938](https://github.com/pirtor/vite/commit/58a2938)), closes [#16376](https://github.com/pirtor/vite/issues/16376)
+
+
+
 ## <small>5.2.4 (2024-03-31)</small>
 
 * release: create-vite@4.4.2 ([ec6e0d7](https://github.com/pirtor/vite/commit/ec6e0d7))
