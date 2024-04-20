@@ -196,6 +196,7 @@ function testCaseInsensitiveFS() {
 }
 
 export const urlCanParse =
+   
   URL.canParse ??
   // URL.canParse is supported from Node.js 18.17.0+, 20.0.0+
   ((path: string, base?: string | undefined): boolean => {
